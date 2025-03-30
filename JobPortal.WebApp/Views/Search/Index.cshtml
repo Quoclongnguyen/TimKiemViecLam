@@ -1,0 +1,162 @@
+﻿@model IEnumerable<JobPortal.Data.Entities.Job>
+
+@{
+    Layout = "_Layout";
+}
+
+<!-- Bắt đầu khu vực Banner -->
+<section class="banner-area relative" id="home">
+    <div class="overlay overlay-bg"></div>
+    <div class="container">
+        <div class="row search-page-top d-flex align-items-center justify-content-center">
+            <div class="banner-content col-lg-12">
+                <h1 class="text-white">
+                    Kết quả tìm kiếm
+                </h1>
+                <p class="text-white link-nav">
+                    <a href="/">Trang chủ </a> <span class="lnr lnr-arrow-right"></span> <a href="#"> Trang tìm kiếm việc làm</a>
+                </p>
+                <!-- Hộp tìm kiếm -->
+                @Html.Partial("../Shared/_SearchBoxPartial.cshtml")
+                @if (ViewBag.q == null && ViewBag.province == null && ViewBag.skill == null)
+                {
+                    <p style="font-size: 25px" class="text-white"><span>@Model.Count()+</span> Việc làm IT dành cho <span> nhà phát triển</span></p>
+                }
+                else
+                {
+                    <p style="font-size: 25px; display: inline;" class="text-white">
+                        <span>@Model.Count()</span> Kết quả tìm thấy
+                    </p>
+                    @if (ViewBag.q != null)
+                    {
+                        <p style="font-size: 25px; display: inline;" class="text-white">với từ khóa <span>"@ViewBag.q"</span></p>
+                    }
+                    @if (ViewBag.province != null)
+                    {
+                        <p style="font-size: 25px; display: inline;" class="text-white">tại <span>@(ViewBag.province != null ? $"{ViewBag.province.Name}" : "")</span></p>
+                    }
+                    @if (ViewBag.skill != null)
+                    {
+                        <p style="font-size: 25px; display: inline;" class="text-white">cho kỹ năng <span>@(ViewBag.skill != null ? $"{ViewBag.skill.Name}" : "")</span></p>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Kết thúc khu vực Banner -->
+<!-- Bắt đầu khu vực bài đăng -->
+<section class="post-area section-gap">
+    <div class="container">
+        <div class="row justify-content-center d-flex">
+            <div class="col-lg-8 post-list">
+
+                <!-- Thành phần thời gian -->
+                <vc:time></vc:time>
+
+                <!-- Danh sách việc làm -->
+                @if (Model.Any())
+                {
+                    @foreach (var job in Model)
+                    {
+                        <div class="single-post d-flex flex-row">
+                            <!-- Kỹ năng công việc -->
+                            <div class="thumb" style="align-items:center">
+                                <a href="/company/@job.AppUser.Slug"><img href="/job/@job.Slug" style="border-radius:10px" width="200" height="100" src="https://localhost:7211/images/employers/@job.AppUser.UrlAvatar" alt="hình ảnh nhà tuyển dụng"></a>
+                                <ul class="tags" style="justify-content:center; display: grid; border-radius:10px">
+                                    <!-- Tỉnh thành -->
+                                    <li style="border-radius:10px">
+                                        <strong><a href="/job?slug=@job.Province.Slug" style="color: black"><span class="lnr lnr-map-marker"></span> @job.Province.Name</a></strong>
+                                    </li>
+                                </ul>
+                                <hr />
+                                <ul class="tags" style="justify-content:center; text-align: center; border-radius:10px">
+                                    <!-- Kỹ năng -->
+                                    @foreach (var skill in job.Skills)
+                                    {
+                                        <li style="border-radius:10px">
+                                            <strong><a href="/job?slug=@skill.Slug" style="color: black">@skill.Name</a></strong>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <!-- Kết thúc kỹ năng công việc -->
+                            <div class="details" style="margin-left:20px; width:600px;">
+                                <div class="title d-flex flex-row justify-content-between">
+                                    <div class="titles">
+                                        <a href="/job/@job.Slug"><h4>@job.Name</h4></a>
+                                        <h5 style="color: gray"><span class="lnr lnr-hourglass"></span> @GetTimeAgo(job.CreateDate)</h5>
+                                        <h5><strong>Từ: <a href="/company/@job.AppUser.Slug">@job.AppUser.FullName</a></strong></h5>
+                                    </div>
+                                </div>
+                                <hr>
+                                <p>@Html.Raw(job.Introduce)</p>
+                                <hr />
+                                <div style="display:flex; justify-content: space-between;">
+                                    <div>
+                                        <h5><strong>Hình thức làm việc: @job.Time.Name</strong></h5>
+                                        <h5 style="color: blue"><span class="lnr lnr-book"></span> <strong>@job.Title.Name</strong></h5>
+                                        <h5 style="color: green"><strong>$ @job.MinSalary - @job.MaxSalary USD</strong></h5>
+                                    </div>
+                                    <div style="text-align:right; margin-top: 40px">
+                                        <ul class="btns">
+                                            <li style="border-radius:10px"><a href="/job/@job.Slug">Ứng tuyển ngay</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center" style="margin-top: 50px;">
+                        <img src="~/images/default/oops.png" alt="rất tiếc" width="600" height="400" style="margin-bottom: 10px; border-radius:10px">
+                        <h4>Rất tiếc! Công việc bạn đang tìm không tồn tại.</h4>
+                    </div>
+                }
+            </div>
+
+            <!-- Sidebar -->
+            @Html.Partial("../Shared/_SidebarPartial.cshtml")
+
+        </div>
+    </div>
+</section>
+<!-- Kết thúc khu vực bài đăng -->
+<!-- Bắt đầu khu vực hành động -->
+<section class="callto-action-area section-gap">
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="menu-content col-lg-9">
+                <div class="title text-center">
+                    <h1 class="mb-10 text-white">Tham gia ngay hôm nay</h1>
+                    <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore  et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+                    <a class="primary-btn" href="#">Tôi là ứng viên</a>
+                    <a class="primary-btn" href="#">Yêu cầu dùng thử miễn phí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Kết thúc khu vực hành động -->
+@functions {
+    public string GetTimeAgo(DateTime? createDate)
+    {
+        DateTime actualCreateDate = createDate.Value;
+        TimeSpan timeAgo = DateTime.Now - actualCreateDate;
+
+        if (timeAgo.TotalMinutes < 60)
+        {
+            return $"Đăng cách đây {Math.Max(1, (int)timeAgo.TotalMinutes)} phút";
+        }
+        else if (timeAgo.TotalHours < 24)
+        {
+            return $"Đăng cách đây {Math.Max(1, (int)timeAgo.TotalHours)} giờ";
+        }
+        else
+        {
+            return $"Đăng cách đây {Math.Max(1, (int)timeAgo.TotalDays)} ngày";
+        }
+    }
+}

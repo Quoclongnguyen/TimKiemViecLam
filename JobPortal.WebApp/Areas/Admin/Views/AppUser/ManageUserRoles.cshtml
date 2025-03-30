@@ -1,0 +1,79 @@
+﻿@model List<JobPortal.Data.ViewModel.UserRolesViewModel>
+
+@{
+    ViewData["Title"] = "Cài đặt vai trò cho người dùng";
+    var userId = ViewBag.userId;
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title text-center">CÀI ĐẶT VAI TRÒ CHO NGƯỜI DÙNG</h4>
+                    <div class="row">
+                        <div class="col-md-8 mx-auto">
+                            <form method="post" enctype="multipart/form-data" id="form">
+                                @for (int i = 0; i < Model.Count; i++)
+                                {
+                                    <div class="form-group m-1">
+                                        <input type="hidden" asp-for="@Model[i].RoleId" />
+                                        <input type="hidden" asp-for="@Model[i].RoleName" />
+                                        <input type="checkbox" asp-for="@Model[i].IsSelected" class="form-check-input" onclick="toggleRoles(this)" />
+                                        <label class="form-check-label" asp-for="@Model[i].IsSelected">
+                                            @Model[i].RoleName
+                                        </label>
+                                        <hr />
+                                    </div>
+                                }
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group text-center" style="margin-bottom: 15px">
+                                    <input style="background-color:forestgreen" type="button" onclick="onConfirm()" value="Xác nhận" class="btn btn-primary" />
+                                    <a asp-action="index"
+                                       class="btn btn-secondary" style="width:auto">Hủy bỏ</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function toggleRoles(checkbox) {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(function (element) {
+                if (element !== checkbox) {
+                    element.checked = false;
+                }
+            });
+        }
+
+        function onConfirm() {
+            Swal.fire({
+                title: 'Cài đặt vai trò cho người dùng?',
+                text: "Bạn có chắc chắn muốn cài đặt vai trò này cho người dùng không?",
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Xác nhận'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $("#form").submit();
+                    Swal.fire(
+                        'Thành công!',
+                        '',
+                        'success'
+                    )
+                }
+            })
+        }
+    </script>
+}
